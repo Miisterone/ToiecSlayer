@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Application de Transcription et d'Analyse d'Image</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container my-5">
+    <h1 class="text-center mb-4">Toeic SpeedRun</h1>
+
+    <div class="flex-container">
+      <div class="card mb-4 flex-item">
+        <div class="card-body">
+          <h2 class="card-title">Transcription Audio</h2>
+          <div class="form-group">
+            <label for="audioUrl">URL du fichier audio :</label>
+            <input type="text" id="audioUrl" class="form-control" placeholder="Entrez l'URL du fichier audio" value="https://www.lms.7speaking.com/apiws/toeic/support/1-1.mp3">
+          </div>
+          <button id="start-transcription" class="btn btn-primary">
+            <i class="fas fa-microphone"></i> Démarrer la transcription
+          </button>
+          <div id="loading-spinner-transcription" class="spinner-border text-primary d-none mt-3" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <div id="transcription" class="result-section mt-3"></div>
+          <div id="alert-message-transcription" class="alert alert-danger d-none mt-3" role="alert"></div>
+        </div>
+      </div>
+
+      <div class="card mb-4 flex-item">
+        <div class="card-body">
+          <h2 class="card-title">Analyse d'Image</h2>
+          <div class="form-group">
+            <label for="imageUrl">URL de l'image :</label>
+            <input type="text" id="imageUrl" class="form-control" placeholder="Entrez l'URL de l'image" value="https://www.lms.7speaking.com/apiws/toeic/support/1-1.jpg">
+          </div>
+          <button id="start-analysis" class="btn btn-success">
+            <i class="fas fa-image"></i> Analyser l'image
+          </button>
+          <div id="loading-spinner-analysis" class="spinner-border text-success d-none mt-3" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <img id="image-preview" class="img-fluid mt-3 d-none" alt="Preview de l'image"/>
+          <div id="image-analysis" class="result-section mt-3"></div>
+          <div id="alert-message-analysis" class="alert alert-danger d-none mt-3" role="alert"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Transcription Audio
+    document.getElementById('start-transcription').addEventListener('click', () => {
+      const audioUrl = document.getElementById('audioUrl').value.trim();
+      if (!audioUrl) {
+        showAlert('Veuillez entrer une URL audio valide', 'transcription', 'danger');
+        return;
+      }
+
+      document.getElementById('start-transcription').disabled = true;
+      document.getElementById('loading-spinner-transcription').classList.remove('d-none');
+      document.getElementById('transcription').textContent = 'Transcription en cours...';
+
+      fetch('/transcribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain'
+        },
+        body: encodeURIComponent(audioUrl)
+      })
+      .then(response => response.text())
+      .then(text => {
+        document.getElementById('transcription').textContent = text;
+        document.getElementById('start-transcription').disabled = false;
+        document.getElementById('loading-spinner-transcription').classList.add('d-none');
+      })
+      .catch(error => {
+        console.error('Erreur :', error);
+        showAlert('Erreur lors de la transcription.', 'transcription', 'danger');
+        document.getElementById('start-transcription').disabled = false;
+        document.getElementById('loading-spinner-transcription').classList.add('d-none');
+      });
+    });
+
+    // Analyse d'Image
+    document.getElementById('start-analysis').addEventListener('click', () => {
+      const imageUrl = document.getElementById('imageUrl').value.trim();
+      if (!imageUrl) {
+        showAlert('Veuillez entrer une URL d\'image valide', 'analysis', 'danger');
+        return;
+      }
+
+      document.getElementById('start-analysis').disabled = true;
+      document.getElementById('loading-spinner-analysis').classList.remove('d-none');
+      document.getElementById('image-analysis').textContent = 'Analyse en cours...';
+      document.getElementById('image-preview').classList.remove('d-none');
+      document.getElementById('image-preview').src = imageUrl;
+
+      fetch('/analyze-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ image_url: imageUrl })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.analysis) {
+          document.getElementById('image-analysis').textContent = data.analysis;
+        } else if (data.error) {
+          document.getElementById('image-analysis').textContent = 'Erreur : ' + data.error;
+        }
+        document.getElementById('start-analysis').disabled = false;
+        document.getElementById('loading-spinner-analysis').classList.add('d-none');
+      })
+      .catch(error => {
+        console.error('Erreur :', error);
+        showAlert('Erreur lors de l\'analyse de l\'image.', 'analysis', 'danger');
+        document.getElementById('start-analysis').disabled = false;
+        document.getElementById('loading-spinner-analysis').classList.add('d-none');
+      });
+    });
+
+    // Fonction pour afficher les alertes
+    function showAlert(message, section, type) {
+      const alertDiv = document.getElementById(`alert-message-${section}`);
+      alertDiv.className = `alert alert-${type} mt-3`;
+      alertDiv.textContent = message;
+      alertDiv.classList.remove('d-none');
+    }
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
