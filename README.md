@@ -28,24 +28,69 @@ transcription-serveur/
 
 ## Installation
 
-1. Clonez ce dépôt :
+### 1. Cloner le dépôt :
+
+```bash
+git clone https://github.com/votre-repo.git
+```
+
+### 2. Installer les dépendances Node.js et Python :
+
+```bash
+npm install
+pip install -U openai-whisper
+```
+
+### 3. Installation de FFmpeg (obligatoire pour Whisper) :
+
+Whisper dépend de FFmpeg pour traiter les fichiers audio. Suivez ces étapes pour installer FFmpeg sur votre système :
+
+#### Pour Windows :
+1. Téléchargez FFmpeg depuis le site officiel : [https://ffmpeg.org/download.html](https://ffmpeg.org/download.html)
+2. Extrayez les fichiers téléchargés dans un dossier (par exemple `C:\ffmpeg`).
+3. Ajoutez le chemin vers le dossier `bin` de FFmpeg à la variable d'environnement `PATH` :
+   - Ouvrez les "Paramètres système avancés".
+   - Cliquez sur "Variables d'environnement".
+   - Modifiez la variable `PATH` et ajoutez le chemin complet vers le dossier `bin` (par exemple `C:\ffmpeg\bin`).
+4. Redémarrez votre terminal et vérifiez l'installation avec la commande suivante :
    ```bash
-   git clone https://github.com/votre-repo.git
+   ffmpeg -version
    ```
 
-2. Installez les dépendances :
-   ```bash
-   npm install
-   ```
+#### Pour Linux :
+```bash
+sudo apt update
+sudo apt install ffmpeg
+```
 
-3. Démarrez le serveur :
-   ```bash
-   node src/server.js
-   ```
+#### Pour macOS :
+```bash
+brew install ffmpeg
+```
 
-4. Accédez à l'application via [http://localhost:3000](http://localhost:3000).
+### 4. Démarrer le serveur :
+
+```bash
+node src/server.js
+```
+
+### 5. Accéder à l'application :
+
+Accédez à l'application via [http://localhost:3000](http://localhost:3000).
+
+## Configuration supplémentaire
+
+Dans le cas où FFmpeg n'est pas détecté correctement par Python, ajoutez manuellement son chemin dans votre script `transcribe.py` :
+
+```python
+import os
+os.environ["PATH"] += os.pathsep + r'C:\path\to\ffmpeg\bin'  # Chemin vers FFmpeg
+```
+
+Remplacez `C:\path\to\ffmpeg\bin` par le chemin approprié sur votre système.
 
 ## Utilisation
 
 - **Transcription** : Allez sur la page `Transcription` via la barre de navigation, entrez l'URL d'un fichier audio et cliquez sur "Démarrer la transcription".
 - **Extraction des réponses** : Allez sur la page `Extraction des réponses`, entrez l'URL d'une API TOEIC et cliquez sur "Extraire les bonnes réponses".
+
