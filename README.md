@@ -94,3 +94,16 @@ Remplacez `C:\path\to\ffmpeg\bin` par le chemin approprié sur votre système.
 - **Transcription** : Allez sur la page `Transcription` via la barre de navigation, entrez l'URL d'un fichier audio et cliquez sur "Démarrer la transcription".
 - **Extraction des réponses** : Allez sur la page `Extraction des réponses`, entrez l'URL d'une API TOEIC et cliquez sur "Extraire les bonnes réponses".
 
+## Exemple Extraction Des Réponses
+
+Récupérer l'url de la requete puis mettre l'url dans **`URL de l'API`** sur la page Extraction
+
+![img_2.png](img_2.png)
+![img_3.png](img_3.png)
+
+##  Exemple Transcription audio
+
+Récupérer l'url de l'audio puis mettre l'url dans **`url du fichier audio`**
+
+![img.png](img.png)
+![img_1.png](img_1.png)
