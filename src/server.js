@@ -8,14 +8,29 @@ const axios = require('axios');
 const fs = require('fs');
 const { exec } = require('child_process');
 
+// Middleware
 app.use(cors());
-app.use(express.static(__dirname));
 app.use(express.json());
 
+// Servir les fichiers statiques depuis le dossier public
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Redirection vers la page extraction par défaut
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client.html'));
+  res.redirect('/extraction');
 });
 
+// Route pour la page de transcription
+app.get('/transcription', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'transcription.html'));
+});
+
+// Route pour la page d'extraction des réponses
+app.get('/extraction', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'extraction.html'));
+});
+
+// Route pour la transcription d'un fichier audio
 app.post('/transcribe', async (req, res) => {
   let audioUrl = '';
 
@@ -44,7 +59,8 @@ app.post('/transcribe', async (req, res) => {
       response.data.pipe(writer);
 
       writer.on('finish', () => {
-        exec(`python transcribe.py ${audioPath}`, (error, stdout, stderr) => {
+        // Mettre à jour le chemin vers transcribe.py ici
+        exec(`python ../transcribe.py ${audioPath}`, (error, stdout, stderr) => {
           fs.unlink(audioPath, (err) => {
             if (err) console.error(`Erreur lors de la suppression du fichier audio : ${err.message}`);
           });
@@ -69,6 +85,7 @@ app.post('/transcribe', async (req, res) => {
   });
 });
 
+// Démarrage du serveur
 app.listen(port, () => {
   console.log(`Serveur en cours d'exécution sur http://127.0.0.1:${port}`);
 });

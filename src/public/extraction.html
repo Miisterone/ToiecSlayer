@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extraction des Réponses</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Toeic Hack</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="transcription.html">Transcription</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="extraction.html">Extraction des Réponses</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <h1 class="text-center mb-4">Extraction des bonnes réponses</h1>
+        <div class="card mb-4 flex-item">
+            <div class="card-body">
+                <h2 class="card-title">Extraction des bonnes réponses</h2>
+                <div class="form-group">
+                    <label for="apiUrl">URL de l'API :</label>
+                    <input type="text" id="apiUrl" class="form-control" placeholder="Entrez l'URL de l'API" value="https://www.lms.7speaking.com/apiws/toeic.cfc?testid=1&partid=1&method=gettoeictest&sessionId=8BE260DFE763116238644EC514E53F9021CEACAA82E1D64872BC08D1E569D14A&languagetaught=ENG&LI=FRE">
+                </div>
+                <button id="fetch-answers" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Extraire les bonnes réponses
+                </button>
+                <div id="loading-spinner-answers" class="spinner-border text-primary d-none mt-3" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <div id="correct-answers" class="result-section mt-3"></div>
+                <div id="alert-message-answers" class="alert alert-danger d-none mt-3" role="alert"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Extraction des bonnes réponses
+        document.getElementById('fetch-answers')?.addEventListener('click', () => {
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            if (!apiUrl) {
+                showAlert('Veuillez entrer une URL valide', 'answers', 'danger');
+                return;
+            }
+
+            document.getElementById('fetch-answers').disabled = true;
+            document.getElementById('loading-spinner-answers').classList.remove('d-none');
+            document.getElementById('correct-answers').textContent = 'Extraction en cours...';
+
+            fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                const correctAnswers = extractCorrectAnswers(data.payload.data);
+                document.getElementById('correct-answers').innerHTML = correctAnswers;
+                document.getElementById('fetch-answers').disabled = false;
+                document.getElementById('loading-spinner-answers').classList.add('d-none');
+            })
+            .catch(error => {
+                console.error('Erreur :', error);
+                showAlert('Erreur lors de l\'extraction des bonnes réponses.', 'answers', 'danger');
+                document.getElementById('fetch-answers').disabled = false;
+                document.getElementById('loading-spinner-answers').classList.add('d-none');
+            });
+        });
+
+        function extractCorrectAnswers(data) {
+            if (!data || data.length === 0) return 'Aucune donnée trouvée.';
+
+            let answers = '';
+            let questionCounter = 1;
+
+            data.forEach(section => {
+                section.questions.forEach(question => {
+                    const correctAnswer = question.answerOptions.answer[0].display;
+                    const questionTitle = question.title && question.title !== "Question"
+                                          ? question.title
+                                          : `Question ${questionCounter}`;
+                    answers += `${questionTitle}: ${correctAnswer}<br>`;
+                    questionCounter++;
+                });
+            });
+            return answers || 'Aucune réponse correcte trouvée.';
+        }
+
+        function showAlert(message, section, type) {
+            const alertDiv = document.getElementById(`alert-message-${section}`);
+            alertDiv.className = `alert alert-${type} mt-3`;
+            alertDiv.textContent = message;
+            alertDiv.classList.remove('d-none');
+        }
+    </script>
+</body>
+</html>

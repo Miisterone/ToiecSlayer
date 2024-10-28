@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcription Audio</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Toeic Hack</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="transcription.html">Transcription</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="extraction.html">Extraction des Réponses</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <h1 class="text-center mb-4">Transcription Audio</h1>
+        <div class="card mb-4 flex-item">
+            <div class="card-body">
+                <h2 class="card-title">Transcription Audio</h2>
+                <div class="form-group">
+                    <label for="audioUrl">URL du fichier audio :</label>
+                    <input type="text" id="audioUrl" class="form-control" placeholder="Entrez l'URL du fichier audio" value="https://www.lms.7speaking.com/apiws/toeic/support/1-1.mp3">
+                </div>
+                <button id="start-transcription" class="btn btn-primary">
+                    <i class="fas fa-microphone"></i> Démarrer la transcription
+                </button>
+                <div id="loading-spinner-transcription" class="spinner-border text-primary d-none mt-3" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <div id="transcription" class="result-section mt-3"></div>
+                <button id="copy-button" class="btn btn-secondary mt-2">
+                    <i class="fas fa-copy"></i> Copier le texte
+                </button>
+                <div id="alert-message-transcription" class="alert alert-danger d-none mt-3" role="alert"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Transcription Audio
+        document.getElementById('start-transcription')?.addEventListener('click', () => {
+            const audioUrl = document.getElementById('audioUrl').value.trim();
+            if (!audioUrl) {
+                showAlert('Veuillez entrer une URL audio valide', 'transcription', 'danger');
+                return;
+            }
+
+            document.getElementById('start-transcription').disabled = true;
+            document.getElementById('loading-spinner-transcription').classList.remove('d-none');
+            document.getElementById('transcription').textContent = 'Transcription en cours...';
+
+            fetch('/transcribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: encodeURIComponent(audioUrl)
+            })
+            .then(response => response.text())
+            .then(text => {
+                document.getElementById('transcription').textContent = text;
+                document.getElementById('start-transcription').disabled = false;
+                document.getElementById('loading-spinner-transcription').classList.add('d-none');
+            })
+            .catch(error => {
+                console.error('Erreur :', error);
+                showAlert('Erreur lors de la transcription.', 'transcription', 'danger');
+                document.getElementById('start-transcription').disabled = false;
+                document.getElementById('loading-spinner-transcription').classList.add('d-none');
+            });
+        });
+
+        // Copier la transcription
+        document.getElementById('copy-button').addEventListener('click', () => {
+            const transcriptionText = document.getElementById('transcription').textContent;
+            if (transcriptionText) {
+                navigator.clipboard.writeText(transcriptionText).then(() => {
+                    alert('Texte copié dans le presse-papiers !');
+                }).catch(err => {
+                    console.error('Erreur lors de la copie : ', err);
+                });
+            } else {
+                alert('Aucune transcription à copier.');
+            }
+        });
+
+        function showAlert(message, section, type) {
+            const alertDiv = document.getElementById(`alert-message-${section}`);
+            alertDiv.className = `alert alert-${type} mt-3`;
+            alertDiv.textContent = message;
+            alertDiv.classList.remove('d-none');
+        }
+    </script>
+</body>
+</html>
