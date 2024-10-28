@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Application de Transcription et d'Analyse d'Image</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -25,26 +27,10 @@
             <span class="sr-only">Loading...</span>
           </div>
           <div id="transcription" class="result-section mt-3"></div>
-          <div id="alert-message-transcription" class="alert alert-danger d-none mt-3" role="alert"></div>
-        </div>
-      </div>
-
-      <div class="card mb-4 flex-item">
-        <div class="card-body">
-          <h2 class="card-title">Analyse d'Image</h2>
-          <div class="form-group">
-            <label for="imageUrl">URL de l'image :</label>
-            <input type="text" id="imageUrl" class="form-control" placeholder="Entrez l'URL de l'image" value="https://www.lms.7speaking.com/apiws/toeic/support/1-1.jpg">
-          </div>
-          <button id="start-analysis" class="btn btn-success">
-            <i class="fas fa-image"></i> Analyser l'image
+          <button id="copy-button" class="btn btn-secondary mt-2">
+            <i class="fas fa-copy"></i> Copier le texte
           </button>
-          <div id="loading-spinner-analysis" class="spinner-border text-success d-none mt-3" role="status">
-            <span class="sr-only">Loading...</span>
-          </div>
-          <img id="image-preview" class="img-fluid mt-3 d-none" alt="Preview de l'image"/>
-          <div id="image-analysis" class="result-section mt-3"></div>
-          <div id="alert-message-analysis" class="alert alert-danger d-none mt-3" role="alert"></div>
+          <div id="alert-message-transcription" class="alert alert-danger d-none mt-3" role="alert"></div>
         </div>
       </div>
     </div>
@@ -84,43 +70,18 @@
       });
     });
 
-    // Analyse d'Image
-    document.getElementById('start-analysis').addEventListener('click', () => {
-      const imageUrl = document.getElementById('imageUrl').value.trim();
-      if (!imageUrl) {
-        showAlert('Veuillez entrer une URL d\'image valide', 'analysis', 'danger');
-        return;
+    // Copier la transcription
+    document.getElementById('copy-button').addEventListener('click', () => {
+      const transcriptionText = document.getElementById('transcription').textContent;
+      if (transcriptionText) {
+        navigator.clipboard.writeText(transcriptionText).then(() => {
+          alert('Texte copié dans le presse-papiers !');
+        }).catch(err => {
+          console.error('Erreur lors de la copie : ', err);
+        });
+      } else {
+        alert('Aucune transcription à copier.');
       }
-
-      document.getElementById('start-analysis').disabled = true;
-      document.getElementById('loading-spinner-analysis').classList.remove('d-none');
-      document.getElementById('image-analysis').textContent = 'Analyse en cours...';
-      document.getElementById('image-preview').classList.remove('d-none');
-      document.getElementById('image-preview').src = imageUrl;
-
-      fetch('/analyze-image', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ image_url: imageUrl })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.analysis) {
-          document.getElementById('image-analysis').textContent = data.analysis;
-        } else if (data.error) {
-          document.getElementById('image-analysis').textContent = 'Erreur : ' + data.error;
-        }
-        document.getElementById('start-analysis').disabled = false;
-        document.getElementById('loading-spinner-analysis').classList.add('d-none');
-      })
-      .catch(error => {
-        console.error('Erreur :', error);
-        showAlert('Erreur lors de l\'analyse de l\'image.', 'analysis', 'danger');
-        document.getElementById('start-analysis').disabled = false;
-        document.getElementById('loading-spinner-analysis').classList.add('d-none');
-      });
     });
 
     // Fonction pour afficher les alertes

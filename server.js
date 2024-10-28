@@ -1,17 +1,17 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = 3000;
+const path = require('path');
 
 const axios = require('axios');
 const fs = require('fs');
-const path = require('path');
 const { exec } = require('child_process');
 
+app.use(cors());
 app.use(express.static(__dirname));
-
 app.use(express.json());
 
-// Route pour servir client.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'client.html'));
 });
@@ -30,65 +30,45 @@ app.post('/transcribe', async (req, res) => {
       return res.status(400).send('URL du fichier audio non fournie.');
     }
 
+    const audioPath = 'audio_input.mp3';
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+
     try {
-      // Télécharger le fichier audio
       const response = await axios({
         method: 'get',
         url: audioUrl,
         responseType: 'stream',
       });
 
-      const audioPath = 'audio_input.mp3'; // Changez le nom si nécessaire
       const writer = fs.createWriteStream(audioPath);
-
       response.data.pipe(writer);
 
       writer.on('finish', () => {
-        // Appeler le script Python
         exec(`python transcribe.py ${audioPath}`, (error, stdout, stderr) => {
-          fs.unlinkSync(audioPath); // Supprimer le fichier audio
+          fs.unlink(audioPath, (err) => {
+            if (err) console.error(`Erreur lors de la suppression du fichier audio : ${err.message}`);
+          });
 
           if (error) {
             console.error(`Erreur lors de l'exécution du script Python : ${error.message}`);
             return res.status(500).send('Erreur lors de la transcription.');
           }
-          if (stderr) {
-            console.error(`Erreur du script Python : ${stderr}`);
-          }
-
-          res.send(stdout); // Envoyer la transcription au client
+          res.send(stdout.trim());
         });
       });
 
       writer.on('error', (err) => {
-        console.error('Erreur lors de l\'écriture du fichier audio :', err);
+        console.error(`Erreur lors de l'écriture du fichier audio : ${err.message}`);
         res.status(500).send('Erreur lors du téléchargement du fichier audio.');
+        writer.end();
       });
     } catch (error) {
-      console.error('Erreur lors du téléchargement du fichier audio :', error);
+      console.error(`Erreur lors du téléchargement du fichier audio : ${error.message}`);
       res.status(500).send('Erreur lors du téléchargement du fichier audio.');
     }
   });
 });
 
-app.post('/analyze-image', async (req, res) => {
-  let imageUrl = req.body.image_url;
-
-  if (!imageUrl) {
-    return res.status(400).json({ error: 'URL de l\'image non fournie.' });
-  }
-
-  try {
-    // Appeler le serveur Flask pour l'analyse de l'image
-    const response = await axios.post('http://127.0.0.1:5000/analyze', { image_url: imageUrl });
-    res.json(response.data);
-  } catch (error) {
-    console.error('Erreur lors de l\'analyse de l\'image :', error);
-    res.status(500).json({ error: 'Erreur lors de l\'analyse de l\'image.' });
-  }
-});
-
-// Démarrer le serveur Node.js
 app.listen(port, () => {
-  console.log(`Serveur en cours d'exécution sur le port ${port}, http://127.0.0.1:3000`);
+  console.log(`Serveur en cours d'exécution sur http://127.0.0.1:${port}`);
 });

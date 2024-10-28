@@ -19,6 +19,17 @@
   transform: translateY(-5px);
 }
 
+#copy-button {
+  background-color: #6c757d;
+  color: white;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+#copy-button:hover {
+  background-color: #5a6268;
+}
+
 @media (max-width: 768px) {
   .flex-container {
     flex-direction: column;
