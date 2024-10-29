@@ -46,7 +46,7 @@ pip install -U openai-whisper
 Whisper dépend de FFmpeg pour traiter les fichiers audio. Suivez ces étapes pour installer FFmpeg sur votre système :
 
 #### Pour Windows :
-1. Téléchargez FFmpeg depuis le site officiel : [https://ffmpeg.org/download.html](https://ffmpeg.org/download.html)
+1. Téléchargez FFmpeg depuis le site officiel : [https://github.com/BtbN/FFmpeg-Builds/releases](https://github.com/BtbN/FFmpeg-Builds/releases)
 2. Extrayez les fichiers téléchargés dans un dossier (par exemple `C:\ffmpeg`).
 3. Ajoutez le chemin vers le dossier `bin` de FFmpeg à la variable d'environnement `PATH` :
    - Ouvrez les "Paramètres système avancés".
@@ -98,12 +98,12 @@ Remplacez `C:\path\to\ffmpeg\bin` par le chemin approprié sur votre système.
 
 Récupérer l'url de la requete puis mettre l'url dans **`URL de l'API`** sur la page Extraction
 
-![img_2.png](img_2.png)
-![img_3.png](img_3.png)
+![img_2.png](doc/img/extractionReponse.png)
+![img_3.png](doc/img/extractionReponse2.png)
 
 ##  Exemple Transcription audio
 
 Récupérer l'url de l'audio puis mettre l'url dans **`url du fichier audio`**
 
-![img.png](img.png)
-![img_1.png](img_1.png)
+![img.png](doc/img/transcriptionAudio.png)
+![img_1.png](doc/img/transcriptionAudio1.png)
