@@ -60,7 +60,7 @@ app.post('/transcribe', async (req, res) => {
 
       writer.on('finish', () => {
         // Mettre à jour le chemin vers transcribe.py ici
-        exec(`python ../transcribe.py ${audioPath}`, (error, stdout, stderr) => {
+        exec(`python3 /app/transcribe.py ${audioPath}`, (error, stdout, stderr) => {
           fs.unlink(audioPath, (err) => {
             if (err) console.error(`Erreur lors de la suppression du fichier audio : ${err.message}`);
           });

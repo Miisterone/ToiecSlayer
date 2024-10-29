@@ -29,8 +29,9 @@
             <div class="card-body">
                 <h2 class="card-title">Extraction des bonnes réponses</h2>
                 <div class="form-group">
-                    <label for="apiUrl">URL de l'API :</label>
-                    <input type="text" id="apiUrl" class="form-control" placeholder="Entrez l'URL de l'API" value="https://www.lms.7speaking.com/apiws/toeic.cfc?testid=1&partid=1&method=gettoeictest&sessionId=8BE260DFE763116238644EC514E53F9021CEACAA82E1D64872BC08D1E569D14A&languagetaught=ENG&LI=FRE">
+                    <p>il y a un token de session donc le placeholder ne marche pas, c'est juste un exemple</p>
+                    <label for="apiUrl">Entrez l'URL de la requete 7speaking :</label>
+                    <input type="text" id="apiUrl" class="form-control" value="https://www.lms.7speaking.com/apiws/toeic.cfc?testid=1&partid=1&method=gettoeictest&sessionId=8BE260DFE763116238644EC514E53F9021CEACAA82E1D64872BC08D1E569D14A&languagetaught=ENG&LI=FRE">
                 </div>
                 <button id="fetch-answers" class="btn btn-primary">
                     <i class="fas fa-download"></i> Extraire les bonnes réponses
