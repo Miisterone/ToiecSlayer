@@ -14,7 +14,7 @@ Ce projet est une application web permettant de transcrire des fichiers audio et
 ### 1. Cloner le dépôt :
 
 ```bash
-git clone https://github.com/votre-repo.git
+git clone https://github.com/Miisterone/ToeicTranslate.git
 ```
 
 ### 2. Utiliser Docker pour Exécuter l'Application
