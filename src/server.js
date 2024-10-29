@@ -12,21 +12,29 @@ const { exec } = require('child_process');
 app.use(cors());
 app.use(express.json());
 
+const log = (message) => {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] ${message}`);
+};
+
 // Servir les fichiers statiques depuis le dossier public
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Redirection vers la page extraction par défaut
 app.get('/', (req, res) => {
+  log('Redirection vers la page d\'extraction.');
   res.redirect('/extraction');
 });
 
 // Route pour la page de transcription
 app.get('/transcription', (req, res) => {
+  log('Demande de la page de transcription.');
   res.sendFile(path.join(__dirname, 'public', 'transcription.html'));
 });
 
 // Route pour la page d'extraction des réponses
 app.get('/extraction', (req, res) => {
+  log('Demande de la page d\'extraction.');
   res.sendFile(path.join(__dirname, 'public', 'extraction.html'));
 });
 
@@ -42,6 +50,7 @@ app.post('/transcribe', async (req, res) => {
     audioUrl = decodeURIComponent(audioUrl);
 
     if (!audioUrl) {
+      log('URL du fichier audio non fournie.');
       return res.status(400).send('URL du fichier audio non fournie.');
     }
 
@@ -49,6 +58,7 @@ app.post('/transcribe', async (req, res) => {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
 
     try {
+      log(`Téléchargement du fichier audio depuis l'URL : ${audioUrl}`);
       const response = await axios({
         method: 'get',
         url: audioUrl,
@@ -59,27 +69,33 @@ app.post('/transcribe', async (req, res) => {
       response.data.pipe(writer);
 
       writer.on('finish', () => {
-        // Mettre à jour le chemin vers transcribe.py ici
+        log('Fichier audio téléchargé avec succès. Démarrage de la transcription.');
         exec(`python3 /app/transcribe.py ${audioPath}`, (error, stdout, stderr) => {
           fs.unlink(audioPath, (err) => {
-            if (err) console.error(`Erreur lors de la suppression du fichier audio : ${err.message}`);
+            if (err) {
+              log(`Erreur lors de la suppression du fichier audio : ${err.message}`);
+            } else {
+              log('Fichier audio supprimé après transcription.');
+            }
           });
 
           if (error) {
-            console.error(`Erreur lors de l'exécution du script Python : ${error.message}`);
+            log(`Erreur lors de l'exécution du script Python : ${error.message}`);
             return res.status(500).send('Erreur lors de la transcription.');
           }
+
+          log('Transcription terminée avec succès.');
+          log(`Transcription : ${stdout.trim()}`);
           res.send(stdout.trim());
         });
       });
 
       writer.on('error', (err) => {
-        console.error(`Erreur lors de l'écriture du fichier audio : ${err.message}`);
+        log(`Erreur lors de l'écriture du fichier audio : ${err.message}`);
         res.status(500).send('Erreur lors du téléchargement du fichier audio.');
-        writer.end();
       });
     } catch (error) {
-      console.error(`Erreur lors du téléchargement du fichier audio : ${error.message}`);
+      log(`Erreur lors du téléchargement du fichier audio : ${error.message}`);
       res.status(500).send('Erreur lors du téléchargement du fichier audio.');
     }
   });
@@ -87,5 +103,5 @@ app.post('/transcribe', async (req, res) => {
 
 // Démarrage du serveur
 app.listen(port, () => {
-  console.log(`Serveur en cours d'exécution sur http://127.0.0.1:${port}`);
+  log(`Serveur en cours d'exécution sur http://127.0.0.1:${port}`);
 });

@@ -30,9 +30,6 @@ RUN npm install
 # Copier le dossier public contenant extraction.html et transcription.html dans /app/public
 COPY src/public /app/public
 
-# Copier tous les autres fichiers du projet dans /app
-COPY . .
-
 # Exposer le port utilisé par le serveur Node.js
 EXPOSE 3000
 
