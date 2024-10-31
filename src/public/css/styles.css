@@ -1,13 +1,13 @@
 /* Couleurs de fond */
 body {
-  background-color: #F5F5F7;
+  background-color: #E0E0E5;
   color: #1D1D1F;
 }
 
 /* Navbar */
 .navbar {
-  background-color: #FFFFFF;
-  border-bottom: 1px solid #E5E5EA;
+  background-color: #ECECEC;
+  border-bottom: 1px solid #CCCCCC;
 }
 
 .navbar-brand {
@@ -15,7 +15,7 @@ body {
 }
 
 .navbar-nav .nav-link {
-  color: #6E6E73 !important;
+  color: #4A4A4F !important;
 }
 
 .navbar-nav .nav-link:hover {
@@ -24,13 +24,13 @@ body {
 
 /* Boutons */
 .btn-primary {
-  background-color: #007AFF;
+  background-color: #005DAA;
   border: none;
   color: #FFFFFF;
 }
 
 .btn-primary:hover {
-  background-color: #005BB5;
+  background-color: #00407A;
 }
 
 .btn-outline-secondary {
@@ -45,7 +45,7 @@ body {
 
 /* Style des cartes */
 .card {
-  background-color: #FFFFFF;
+  background-color: #ECECEE;
   border: none;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
 }

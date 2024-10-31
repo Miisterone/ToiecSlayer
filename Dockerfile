@@ -8,8 +8,8 @@ RUN apt-get update && \
 # Installer une version compatible de NumPy
 RUN pip3 install "numpy<2"
 
-# Installer PyTorch sans spécifier de version (adapté pour architectures M1)
-RUN pip3 install torch torchvision torchaudio
+# Installer PyTorch
+RUN pip3 install torch==1.10.1+cpu torchvision==0.11.2+cpu torchaudio==0.10.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
 
 # Installer Whisper et ses dépendances
 RUN pip3 install -U openai-whisper tiktoken
